@@ -8,5 +8,7 @@ import (
 func main() {
 	r := gin.Default() //creates router with Logger and recovery middleware
     http.RegisterRoute(r)
+    r.Use(http.LoggerMiddleaware())
     r.Run(":8080")
+
 }
