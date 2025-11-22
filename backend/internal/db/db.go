@@ -24,7 +24,7 @@ func Connect() *sql.DB {
 	}
 
 	if err = conn.PingContext(context.Background()); err != nil {
-		log.Fatal("Could not ping db")
+		log.Fatal("Could not ping db: ", err)
 	}
 
 	fmt.Println("Connected to PostgreSQL")
