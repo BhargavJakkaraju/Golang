@@ -1,18 +1,31 @@
 package main
 
 import (
-	"golang/backend/internal/http"
-    "golang/backend/internal/db"
-	"github.com/gin-gonic/gin"
+	"fmt"
+	"log"
+
+	"golang/backend/internal/config"
+	"golang/backend/internal/repository"
 )
 
 func main() {
-	// Connect to database first
-	db.Connect()
-	
-	// Setup router
-	r := gin.Default() //creates router with Logger and recovery middleware
-	r.Use(http.LoggerMiddleaware())
-	http.RegisterRoute(r)
-	r.Run(":8080")
+	// Load configuration from environment variables
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	// Connect to database
+	database, err := repository.Connect(cfg.DatabaseURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer database.Close()
+
+	// Test the connection
+	if err := repository.TestConnection(database); err != nil {
+		log.Fatalf("Database connection test failed: %v", err)
+	}
+
+	fmt.Println("🎉 All tests passed! Database is ready to use.")
 }
