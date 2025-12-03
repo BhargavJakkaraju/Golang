@@ -35,3 +35,31 @@ type Message struct {
 
 }
 
+type JoinPayload struct {
+	UserID string `json:"user_id"`
+	Username string `json:"username"`
+	Role string `json:"role"`
+	ClassID string `json:"class_id"`
+}
+
+type LeavePayload struct {
+	UserID string `json:"user_id"`
+	ClassID string `json:"class_id"`
+	Reason string `json:"reason"`
+}
+
+type EngagmentUpdatePayload struct {
+	UserID string `json:"user_id"`
+	AttentionLevel float64 `json:"attention_level"`
+	ConfusionLevel float64 `json:"confusion_level"`
+	ParticipationRate float64 `json:"participation_rate"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+type WhiteboardUpdatePayload struct {
+	Action string `json:"action"`
+	Data json.RawMessage `json:"data"`
+	UserID string `json:"user_id"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
