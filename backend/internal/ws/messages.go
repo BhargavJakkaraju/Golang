@@ -91,7 +91,7 @@ type SuccessPayload struct {
 //helper function that creates new message
 func NewMessage(msgType MessageType, payload interface{}, userID, classID string)(*Message, error) {
 	payloadBytes, err := json.Marshal(payload)
-	if err == nil {
+	if err != nil {
 		return nil, err
 	}
 
