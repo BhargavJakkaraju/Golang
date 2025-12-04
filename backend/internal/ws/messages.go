@@ -87,3 +87,19 @@ type SuccessPayload struct {
 	Action string `json:"action"`
 	Message string `json:"message"`
 }
+
+//helper function that creates new message
+func NewMessage(msgType MessageType, payload interface{}, userID, classID string)(*Message, error) {
+	payloadBytes, err := json.Marshal(payload)
+	if err == nil {
+		return nil, err
+	}
+
+	return &Message{
+		Type: msgType,
+		Payload: payloadBytes,
+		UserID: userID,
+		ClassID: classID,
+		Timestamp: time.Now(),
+	}, nil
+}
