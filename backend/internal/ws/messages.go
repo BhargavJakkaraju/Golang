@@ -103,3 +103,7 @@ func NewMessage(msgType MessageType, payload interface{}, userID, classID string
 		Timestamp: time.Now(),
 	}, nil
 }
+
+func ParsePayload(msg *Message, target interface{}) error {
+	return json.Unmarshal(msg.Payload, target)
+}
