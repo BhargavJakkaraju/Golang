@@ -1,0 +1,15 @@
+# This file tells Docker which files and folders to ignore
+# The node_modules directory will be installed inside the container
+# Do not copy the local version
+node_modules
+# Ignore npm log files
+npm-debug.log*
+*.log
+# Ignore Git-related files
+.git
+.gitignore
+# Ignore Docker-related files
+.dockerignore
+Dockerfile
+# Ignore local environment files
+.env
