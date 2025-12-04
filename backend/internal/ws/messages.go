@@ -63,3 +63,27 @@ type WhiteboardUpdatePayload struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
+type DrawData struct {
+	Tool string `json:"tool"`
+	Color string `json:"color"`
+	Width int `json:"width"`
+	Points []Point `json:"points"`
+	StartTime time.Time `json:"start_time"`
+	EndTime time.Time `json:"end_time"`
+}
+
+type Point struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
+type ErrorPayload struct {
+	Code string `json:"code"`
+	Message string `json:"message"`
+	Details string `json:"details"`
+}
+
+type SuccessPayload struct {
+	Action string `json:"action"`
+	Message string `json:"message"`
+}
