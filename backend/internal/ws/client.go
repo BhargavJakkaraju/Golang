@@ -147,7 +147,7 @@ func (c *Client) sendError(code, message string) {
 
 	msgBytes, err := json.Marshal(msg)
 	if err != nil {
-		log.printf("Failed to marshal error message, %v", err)
+		log.Printf("Failed to marshal error message, %v", err)
 	}
 
 	//non-blocking send
@@ -155,5 +155,30 @@ func (c *Client) sendError(code, message string) {
 	case c.send <-msgBytes:
 	default:
 		log.Printf("Failed to send error to client")
+	}
+}
+
+func (c *Client) sendSuccess(action, message string) {
+	successPayload := SuccessPayload{
+		Action:  action,
+		Message: message,
+	}
+
+	msg, err := NewMessage(MessageTypeSuccess, successPayload, "system", c.classID)
+	if err != nil {
+		log.Printf("Failed to create success message: %v", err)
+		return
+	}
+
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		log.Printf("Failed to marshal success message: %v", err)
+		return
+	}
+
+	select {
+	case c.send <- msgBytes:
+	default:
+		log.Printf("Failed to send success to client %s: send channel full", c.userID)
 	}
 }
