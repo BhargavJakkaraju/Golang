@@ -132,4 +132,28 @@ func (c *Client) writePump() {
 	}
 }
 
+//helper methods
+func (c *Client) sendError(code, message string) {
+	errorPayload := ErrorPayload{
+		Code: code,
+		Message: message,
+	}
 
+	msg, err := NewMessage(MessageTypeError, errorPayload, "system", c.classID)
+	if err != nil {
+		log.Printf("Failed to create error message,%v", err)
+		return
+	}
+
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		log.printf("Failed to marshal error message, %v", err)
+	}
+
+	//non-blocking send
+	select {
+	case c.send <-msgBytes:
+	default:
+		log.Printf("Failed to send error to client")
+	}
+}
