@@ -60,7 +60,32 @@ func (c *Client) readPump() {
 		if msg.ClassID != c.classID { continue}
 		if msg.UserID != c.userID{ continue}
 
+		switch msg.Type {
+		case MessageTypeJoin:
+			log.Printf("User %s joined class %s", c.userID, c.classID)
+		case MessageTypeEngagmentUpdate:
+			var payload EngagmentUpdatePayload
+			if err := ParsePayload(&msg, &payload); err != nil {
+				c.sendError("Invalid Payload")
+				continue
+			}
+			log.Printf("Engagment update from user %s, attention=%.1f,  confusion=%.1f", c.userID, payload.AttentionLevel, payload.ConfusionLevel)
+			c.hub.broadcast <- &msg
+		case MessageTypeWhiteboardUpdate:
+			var payload WhiteboardUpdatePayload
+			if err := ParsePayload(&msg, &payload); err != nil {
+				c.sendError("Invalid Payload")
+				continue
+			}
+			log.Printf("Whiteboard Update from user %s, action:%s", c.userID, payload.Action)
+			c.hub.broadcast <- &msg
+		case MessageTypeLeave:
+			log.Printf("User %s left class %s", c.userID, c.classID)
+			return
+		default:
+			log.Printf("Unknown message from %s, class %s", c.userID, c.classID)
+			c.sendError("Unknown Type")
+		}
 	}
-	
 }
 
