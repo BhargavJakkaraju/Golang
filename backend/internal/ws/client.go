@@ -66,7 +66,7 @@ func (c *Client) readPump() {
 		case MessageTypeEngagmentUpdate:
 			var payload EngagmentUpdatePayload
 			if err := ParsePayload(&msg, &payload); err != nil {
-				c.sendError("Invalid Payload")
+				c.sendError("Invalid Payload", "Failed to parse message")
 				continue
 			}
 			log.Printf("Engagment update from user %s, attention=%.1f,  confusion=%.1f", c.userID, payload.AttentionLevel, payload.ConfusionLevel)
@@ -74,7 +74,7 @@ func (c *Client) readPump() {
 		case MessageTypeWhiteboardUpdate:
 			var payload WhiteboardUpdatePayload
 			if err := ParsePayload(&msg, &payload); err != nil {
-				c.sendError("Invalid Payload")
+				c.sendError("Invalid Payload", "Message class ID doesn't match connection")
 				continue
 			}
 			log.Printf("Whiteboard Update from user %s, action:%s", c.userID, payload.Action)
@@ -84,7 +84,7 @@ func (c *Client) readPump() {
 			return
 		default:
 			log.Printf("Unknown message from %s, class %s", c.userID, c.classID)
-			c.sendError("Unknown Type")
+			c.sendError("Unknown Type", "Cannot send messages as another user")
 		}
 	}
 }
