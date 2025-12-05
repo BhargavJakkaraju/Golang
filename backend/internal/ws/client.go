@@ -16,19 +16,21 @@ const (
 
 type Client struct {
 	conn *websocket.Conn
-	hub *Hub 
-	send chan[] byte
+	//hub *Hub TODO
+	send chan []byte
 
 	userID string
 	classID string
 	role string
 }
 
+//readPump and writePUmp are 2 different GoRoutines
+
 //readPump handles incoming requests from the websocket
 func (c *Client) readPump() {
 	//handles client disconnect
 	defer func() {
-		c.hub.unregister <- c
+		//c.hub.unregister <- c
 		c.conn.Close()
 		log.Printf("Client %s disconnected from class %s", c.userID, c.classID)
 	} ()
@@ -46,7 +48,7 @@ func (c *Client) readPump() {
 
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Println("Websocket err for user %s: %s", c.userID, err)
+				log.Printf("Websocket err for user %s: %s", c.userID, err)
 			}
 			break
 		}
@@ -70,7 +72,7 @@ func (c *Client) readPump() {
 				continue
 			}
 			log.Printf("Engagment update from user %s, attention=%.1f,  confusion=%.1f", c.userID, payload.AttentionLevel, payload.ConfusionLevel)
-			c.hub.broadcast <- &msg
+			//c.hub.broadcast <- &msg
 		case MessageTypeWhiteboardUpdate:
 			var payload WhiteboardUpdatePayload
 			if err := ParsePayload(&msg, &payload); err != nil {
@@ -78,7 +80,7 @@ func (c *Client) readPump() {
 				continue
 			}
 			log.Printf("Whiteboard Update from user %s, action:%s", c.userID, payload.Action)
-			c.hub.broadcast <- &msg
+			//c.hub.broadcast <- &msg
 		case MessageTypeLeave:
 			log.Printf("User %s left class %s", c.userID, c.classID)
 			return
