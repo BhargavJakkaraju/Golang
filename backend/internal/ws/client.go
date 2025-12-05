@@ -10,7 +10,7 @@ import (
 const (
 	writeWait = 10 * time.Second
 	pongWait = 60 * time.Second
-	pingWait = (pongWait * 9) / 10
+	pingPeriod = (pongWait * 9) / 10
 	maxMessageSize = 10 * 1024 * 1024
 )
 
@@ -88,4 +88,48 @@ func (c *Client) readPump() {
 		}
 	}
 }
+
+//write pump, handles outgoing messages
+func (c *Client) writePump() {
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		ticker.Stop()
+		c.conn.Close()
+	} ()
+
+	for {
+		select {
+		case message, ok := <- c.send:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if !ok {
+				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+
+			//message optimization
+			w, err := c.conn.NextWriter(websocket.TextMessage)
+			if err != nil {
+				return
+			}
+
+			w.Write(message)
+
+			n := len(c.send)
+			for i := 0; i < n; i++ {
+				w.Write([]byte{'\n'})
+				w.Write(<-c.send)
+			}
+			if err := w.Close(); err != nil {
+				return
+			}
+		//Time to send a Ping
+		case <-ticker.C:
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
+		}
+	}
+}
+
 
