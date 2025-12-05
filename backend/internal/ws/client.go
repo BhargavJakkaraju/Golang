@@ -24,5 +24,12 @@ type Client struct {
 	role string
 }
 
-
+//readPump handles incoming requests from the websocket
+func (c *Client) readPump() {
+	defer func() {
+		c.hub.unregister <- c
+		c.conn.Close()
+		log.Printf("Client %s disconnected from class %s", c.userID, c.classID)
+	} ()
+}
 
